@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FasoStudy</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #172033;
+}
+
+header {
+  background: #087443;
+  color: white;
+  padding: 25px 18px;
+  border-radius: 0 0 25px 25px;
+}
+
+header h1 {
+  margin: 0 0 8px;
+}
+
+main {
+  padding: 18px;
+  max-width: 650px;
+  margin: auto;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  margin-bottom: 15px;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px #0000000d;
+}
+
+h2 {
+  font-size: 19px;
+  margin-top: 0;
+}
+
+button, input {
+  font-size: 16px;
+  padding: 12px;
+  border-radius: 9px;
+  border: 1px solid #d1d5db;
+}
+
+button {
+  background: #087443;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin: 5px 3px 5px 0;
+}
+
+input {
+  width: 100%;
+  margin: 6px 0;
+}
+
+.result {
+  font-weight: bold;
+  color: #087443;
+  margin-top: 12px;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>📚 FasoStudy</h1>
+  <p>Apprends, révise et réussis !</p>
+</header>
+
+<main>
+
+  <section class="card">
+    <h2>👋 Bienvenue !</h2>
+    <p>Ton espace de travail scolaire.</p>
+    <button onclick="saluer()">Me motiver</button>
+    <p id="motivation"></p>
+  </section>
+
+  <section class="card">
+    <h2>🧮 Calculatrice</h2>
+    <input id="n1" type="number" placeholder="Premier nombre">
+    <input id="n2" type="number" placeholder="Deuxième nombre">
+
+    <button onclick="calculer('+')">+</button>
+    <button onclick="calculer('-')">−</button>
+    <button onclick="calculer('*')">×</button>
+    <button onclick="calculer('/')">÷</button>
+
+    <p class="result" id="resultat"></p>
+  </section>
+
+  <section class="card">
+    <h2>📊 Calcul de moyenne</h2>
+    <input id="notes" type="text"
+      placeholder="Ex. 12, 15, 14, 16">
+    <button onclick="moyenne()">Calculer ma moyenne</button>
+    <p class="result" id="moyenneResultat"></p>
+  </section>
+
+  <section class="card">
+    <h2>📝 Quiz de culture générale</h2>
+    <p id="question"></p>
+    <div id="reponses"></div>
+    <p class="result" id="score"></p>
+    <button onclick="suivant()">Question suivante</button>
+  </section>
+
+</main>
+
+<footer>
+  FasoStudy © 2026 — Réussissons ensemble !
+</footer>
+
+<script>
+function saluer() {
+  document.getElementById("motivation").textContent =
+    "Tu peux réussir ! Travaille un peu chaque jour 💪";
+}
+
+function calculer(operation) {
+  const a = Number(document.getElementById("n1").value);
+  const b = Number(document.getElementById("n2").value);
+  const resultat = document.getElementById("resultat");
+
+  if (
+    document.getElementById("n1").value === "" ||
+    document.getElementById("n2").value === ""
+  ) {
+    resultat.textContent = "Entre les deux nombres.";
+    return;
+  }
+
+  if (operation === "/" && b === 0) {
+    resultat.textContent = "Division par zéro impossible.";
+    return;
+  }
+
+  let r;
+
+  if (operation === "+") r = a + b;
+  if (operation === "-") r = a - b;
+  if (operation === "*") r = a * b;
+  if (operation === "/") r = a / b;
+
+  resultat.textContent = "Résultat : " + r;
+}
+
+function moyenne() {
+  const texte = document.getElementById("notes").value.trim();
+  const resultat = document.getElementById("moyenneResultat");
+
+  const notes = texte.split(/[,; ]+/).map(Number);
+
+  if (
+    texte === "" ||
+    notes.some(n => !Number.isFinite(n) || n < 0 || n > 20)
+  ) {
+    resultat.textContent = "Entre des notes entre 0 et 20.";
+    return;
+  }
+
+  const m = notes.reduce((a, b) => a + b, 0) / notes.length;
+
+  resultat.textContent = "Ta moyenne : " + m.toFixed(2) + "/20";
+}
+
+const questions = [
+  {
+    q: "Quelle est la capitale du Burkina Faso ?",
+    r: ["Bobo-Dioulasso", "Ouagadougou", "Koudougou"],
+    bonne: 1
+  },
+  {
+    q: "Combien font 7 × 8 ?",
+    r: ["54", "56", "64"],
+    bonne: 1
+  },
+  {
+    q: "Quelle planète est surnommée la planète rouge ?",
+    r: ["Mars", "Vénus", "Jupiter"],
+    bonne: 0
+  }
+];
+
+let numero = 0;
+let points = 0;
+let repondu = false;
+
+function afficherQuestion() {
+  const q = questions[numero];
+
+  document.getElementById("question").textContent =
+    (numero + 1) + ". " + q.q;
+
+  document.getElementById("reponses").innerHTML = "";
+
+  q.r.forEach((reponse, i) => {
+    const bouton = document.createElement("button");
+    bouton.textContent = reponse;
+
+    bouton.onclick = () => {
+      if (repondu) return;
+      repondu = true;
+
+      if (i === q.bonne) {
+        points++;
+        document.getElementById("score").textContent =
+          "Bonne réponse ! Score : " + points;
+      } else {
+        document.getElementById("score").textContent =
+          "Mauvaise réponse. La bonne réponse était : " +
+          q.r[q.bonne] + ". Score : " + points;
+      }
+
+      document.querySelectorAll("#reponses button")
+        .forEach(b => b.disabled = true);
+    };
+
+    document.getElementById("reponses").appendChild(bouton);
+  });
+
+  document.getElementById("score").textContent =
+    "Score : " + points + "/" + questions.length;
+}
+
+function suivant() {
+  if (numero < questions.length - 1) {
+    numero++;
+  } else {
+    numero = 0;
+    points = 0;
+  }
+
+  repondu = false;
+  afficherQuestion();
+}
+
+afficherQuestion();
+</script>
+
+</body>
+</html>
